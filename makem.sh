@@ -60,6 +60,7 @@ Rules:
   lint-checkdoc  Run checkdoc.
   lint-compile   Byte-compile source files with warnings as errors.
   lint-declare   Run check-declare.
+  lint-elsa      Run Elsa.
   lint-indent    Lint indentation.
   lint-package   Run package-lint.
   lint-regexps   Run relint.
@@ -478,8 +479,10 @@ function sandbox {
     then
         debug "Installing linters: package-lint relint"
 
-        args_sandbox_package_install+=(--eval "(package-install 'package-lint)"
-                                       --eval "(package-install 'relint)")
+        args_sandbox_package_install+=(
+            --eval "(package-install 'elsa)"
+            --eval "(package-install 'package-lint)"
+            --eval "(package-install 'relint)")
     fi
 
     # *** Install packages into sandbox
@@ -734,6 +737,17 @@ function lint-declare {
         "${files_project_feature[@]}" \
         && success "Linting declarations finished without errors." \
             || error "Linting declarations failed."
+}
+
+function lint-elsa {
+    verbose 1 "Linting with Elsa..."
+
+    run_emacs \
+        --load elsa \
+        -f elsa-run-files-and-exit \
+        "${files_project_feature[@]}" \
+        && success "Linting with Elsa finished without errors." \
+            || error "Linting with Elsa failed."
 }
 
 function lint-indent {
